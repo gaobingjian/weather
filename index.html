@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+	</head>
+	<style type="text/css">
+		.wrap{
+			margin:0 auto;
+			height:300px;
+			width:300px;
+			border:1px solid skyblue;
+		}
+	</style>
+	<body>
+		<div class="wrap">
+			<input type="text" id="search" placeholder="请输入要查询的城市" value="" /><br>
+			城市：<span class="city"></span><br>
+			温度：<span class="tmp"></span><br>
+			风向：<span class="windDir"></span><br>
+			时间：<span class="locTime"></span><br>
+			天气状况：<span class="text"></span><br>
+			<img src="" >
+		</div>
+		
+		<script type="text/javascript">
+			function ajax(url, fn) {
+				var xhr= new XMLHttpRequest();
+				xhr.open("GET", url);
+				xhr.send();
+				xhr.onreadystatechange = function () {
+					if(xhr.readyState == 4 && xhr.status == 200) {
+						// console.log(xhr.readyState);
+						// console.log(xhr.status);
+						fn(xhr);
+					}
+				}
+			}
+						
+			var input = document.getElementsByTagName('input')[0];
+			input.onkeydown = function (e) {
+				if(e.key == "Enter" && input.value != "") {
+					var httpUrl = `https://free-api.heweather.net/s6/weather/now?location=${input.value}&key=df682e9c167b4017b634011d4251c667`;
+					var city = document.getElementsByClassName("city")[0];
+					var windDir = document.getElementsByClassName("windDir")[0];
+					var tmp = document.getElementsByClassName("tmp")[0];
+					var text = document.getElementsByClassName("text")[0];
+					var locTime = document.getElementsByClassName("locTime")[0];
+					var img = document.getElementsByTagName('img')[0];
+					
+					input.value = "";
+					ajax(httpUrl, function(xhr){
+						//console.log(xhr);
+						var obj = JSON.parse(xhr.responseText);
+						// console.log(obj);
+						var weather = obj.HeWeather6[0];
+						//console.log(weather);
+						
+						var imgUrl = `https://cdn.heweather.com/cond_icon/${weather.now.cond_code}.png`;
+						city.innerHTML = weather.basic.location;
+						tmp.innerHTML = weather.now.tmp + " ℃";
+						windDir.innerHTML = weather.now.wind_dir;
+						text.innerHTML = weather.now.cond_txt;
+						locTime.innerHTML = weather.update.loc;
+						img.src = imgUrl;
+					})
+				}
+			}
+			
+		</script>
+	</body>
+</html>
